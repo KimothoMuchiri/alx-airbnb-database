@@ -57,4 +57,18 @@ Existing:
   - idx_messages_sender_sent 
 
 #### Measuring Impact
-For the users and bookings tables, duration of executing the queries `WHERE` and `JOIN` **went down from  0.078 sec to 0.000 sec** with the indexing implemented
+the output of running the query when indexed ias as follows:
+
+`-> Index range scan on b using idx_bookings_start_end over (start_date < '2025-01-10'), with index condition: ((b.start_date < <cache>(cast('2025-01-10' as date))) and (b.end_date > <cache>(cast('2025-12-05' as date))))`
+
+- `Index range scan:` It means the database is not performing a full table scan. Instead, it's using an index to narrow down the search range. This is exactly what we want to see.
+
+- `using idx_bookings_start_end:` This confirms that your new index, which you've named `idx_bookings_start_end,` is being used by the query optimizer.
+
+- `with index condition:` This part shows that the database is applying the conditions (start_date < ... and end_date > ...) directly to the index itself, making the filtering incredibly efficient.
+
+The `Filter: (b.status = 'canceled')` line shows that after using the index to find a narrow range of rows, the database then applies the status filter to those few rows, which is a very efficient process.
+
+The rows=1 part of the output means that the optimizer estimated that it only needed to examine a single row to satisfy the LIMIT 1 condition. It's a key indicator of efficiency. Because the index helped the database find the target row so quickly, it didn't have to scan many rows at all. The cost=0.71 also shows that this was a very cheap operation.
+
+

@@ -7,17 +7,10 @@
 USE airbnb_demo;
 
 /*****************************************************************************************
-USERS
-Common patterns:
-  - Lookups by role (role-based admin/host dashboards).
-  - Recent users (created_at DESC).
-  - Name searches + ordering (last_name, first_name).
-Existing:
-  - PK on user_id
-  - UNIQUE on email
+users
 *****************************************************************************************/
 
--- Role filter (was optional in schema — enable it)
+-- Role filter 
 CREATE INDEX idx_users_role ON users(role);
 
 -- Recent users lists, retention cohorts, etc.
@@ -28,14 +21,7 @@ CREATE INDEX idx_users_last_first ON users(last_name, first_name);
 
 
 /*****************************************************************************************
-PROPERTIES
-Common patterns:
-  - Browse/search by location, then sort/filter by price.
-  - Host dashboards: find properties by host and creation date.
-Existing:
-  - idx_properties_host_id(host_id)
-  - idx_properties_location(location)
-  - idx_properties_pricepernight(pricepernight)
+properties
 *****************************************************************************************/
 
 -- Composite to support: WHERE location=? ORDER BY pricepernight
@@ -46,16 +32,7 @@ CREATE INDEX idx_properties_host_created ON properties(host_id, created_at);
 
 
 /*****************************************************************************************
-BOOKINGS
-Common patterns:
-  - Availability check: WHERE property_id=? AND date ranges overlap
-  - User itinerary: WHERE user_id=? ORDER BY start_date
-  - Ops views by status and date: WHERE status='confirmed' AND start_date BETWEEN ...
-Existing:
-  - idx_bookings_property_id(property_id)
-  - idx_bookings_user_id(user_id)
-  - idx_bookings_status(status)
-  - idx_bookings_start_end(start_date, end_date)
+Bookings
 *****************************************************************************************/
 
 -- Availability lookups benefit from leading property_id, then dates
@@ -70,7 +47,7 @@ CREATE INDEX idx_bookings_status_start ON bookings(status, start_date);
 
 
 /*****************************************************************************************
-OPTIONAL / NICE-TO-HAVE (outside the strict User/Booking/Property scope)
+NICE-TO-HAVE (outside the strict User/Booking/Property scope)
 *****************************************************************************************/
 
 /* PAYMENTS */
@@ -91,8 +68,7 @@ CREATE INDEX idx_messages_sender_sent ON messages(sender_id, sent_at);
 
 
 /*****************************************************************************************
-MEASURING IMPACT (run these interactively around the CREATE INDEX statements)
-Use both EXPLAIN and EXPLAIN ANALYZE (MySQL 8.0.18+). Keep sample values realistic.
+MEASURING IMPACT 
 *****************************************************************************************/
 
 -- A) Availability check (benefits: idx_bookings_property_dates)
@@ -100,9 +76,9 @@ Use both EXPLAIN and EXPLAIN ANALYZE (MySQL 8.0.18+). Keep sample values realist
 EXPLAIN FORMAT=TREE
 SELECT 1
 FROM bookings b
-WHERE b.property_id = 'PROPERTY-UUID-HERE'
+WHERE b.status = 'canceled'
   AND b.start_date < DATE('2025-01-10')
-  AND b.end_date   > DATE('2025-01-05')
+  AND b.end_date   > DATE('2025-12-05')
 LIMIT 1;
 
 -- B) User itinerary (benefits: idx_bookings_user_dates)

@@ -37,6 +37,7 @@ JOIN properties AS p
   ON p.property_id = b.property_id
 LEFT JOIN payments AS pay
   ON pay.booking_id = b.booking_id
+WHERE b.created_at = "2025-12-01"
 ORDER BY b.created_at DESC, pay.payment_date DESC;
 
 -- Notes:

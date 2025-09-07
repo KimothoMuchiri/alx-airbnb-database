@@ -12,7 +12,6 @@ SECTION 1 — INITIAL (NAÏVE) QUERY
 *****************************************************************************************/
 
 -- EXPLAIN the baseline
-EXPLAIN FORMAT=TREE
 SELECT
   b.booking_id,
   b.property_id,

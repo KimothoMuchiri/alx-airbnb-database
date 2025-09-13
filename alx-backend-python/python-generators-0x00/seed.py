@@ -6,15 +6,15 @@ from mysql.connector import Error
 
 DB_NAME = "ALX_prodev"
 TABLE_NAME = "user_data"
-CSV_FILE = "user_data.csv"
+CSV_FILE = "D:/ALX_backend/alx-airbnb-database/alx-backend-python/python-generators-0x00/data.csv"
 
 def connect_db():
     """Connects to the MySQL database server."""
     try:
         connection = mysql.connector.connect(
             host="localhost",
-            user="root",
-            password="20marcelati20"
+            user= USER,
+            password= PASSWORD
         )
         if connection.is_connected():
             print("Successfully connected to MySQL server!")
@@ -38,8 +38,8 @@ def connect_to_prodev():
     try:
         connection = mysql.connector.connect(
             host="localhost",
-            user="root",
-            password="20marcelati20",
+            user= USER,
+            password= PASSWORD,
             database=DB_NAME
         )
         if connection.is_connected():
